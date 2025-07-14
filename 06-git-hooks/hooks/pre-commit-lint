@@ -1,0 +1,20 @@
+#!/bin/bash
+# File: hooks/pre-commit-lint
+
+# Run linter on staged files
+files=$(git diff --cached --name-only --diff-filter=ACM | grep '\.js$')
+if [ -n "$files" ]; then
+  echo "Running linter on JavaScript files..."
+  # Replace with your actual linting command
+  # eslint $files
+  
+  # For demonstration, we'll just check for semicolons
+  for file in $files; do
+    if grep -l "[^;]$" "$file"; then
+      echo "ERROR: Missing semicolons in $file"
+      exit 1
+    fi
+  done
+fi
+
+exit 0

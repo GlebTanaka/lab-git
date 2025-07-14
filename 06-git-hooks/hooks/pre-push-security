@@ -1,0 +1,23 @@
+#!/bin/bash
+# File: hooks/pre-push-security
+
+echo "Running security checks before push..."
+
+# Check for sensitive information in staged files
+sensitive_patterns=(
+  "password\s*=\s*['\"][^'\"]+['\"]"
+  "api[_-]?key\s*=\s*['\"][^'\"]+['\"]"
+  "secret\s*=\s*['\"][^'\"]+['\"]"
+  "BEGIN (RSA|DSA|EC|OPENSSH) PRIVATE KEY"
+)
+
+for pattern in "${sensitive_patterns[@]}"; do
+  if git grep -E "$pattern" $(git diff --cached --name-only); then
+    echo "ERROR: Potential sensitive information detected."
+    echo "Please remove sensitive data before pushing."
+    exit 1
+  fi
+done
+
+echo "No sensitive information detected."
+exit 0
